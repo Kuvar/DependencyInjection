@@ -36,7 +36,7 @@ namespace DependencyInjectionLearning.Controllers
             var Islogin = repo.GetAll().FirstOrDefault(p => p.Email == model.UserName && p.Password == model.Password);
             if (Islogin != null)
             {
-                FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, Islogin.Name, DateTime.Now, DateTime.Now.AddDays(2), false, Islogin.Role.RoleType);
+                FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(1, Islogin.Name, DateTime.Now, DateTime.Now.AddDays(2), model.RememberMe, Islogin.Role.RoleType);
                 String encryptedTicket = FormsAuthentication.Encrypt(authTicket);
                 HttpCookie authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
                 System.Web.HttpContext.Current.Response.Cookies.Add(authCookie);
@@ -53,6 +53,18 @@ namespace DependencyInjectionLearning.Controllers
             }
 
             return View();
+        }
+
+        public ActionResult Logout()
+        {
+            FormsAuthentication.SignOut();
+
+            // clear authentication cookie
+            HttpCookie cookie1 = new HttpCookie(FormsAuthentication.FormsCookieName, "");
+            cookie1.Expires = DateTime.Now.AddYears(-1);
+            Response.Cookies.Add(cookie1);
+
+            return View("Login");
         }
     }
 }
